@@ -1,0 +1,36 @@
+{
+  "name": "ProgrammingQuizLearningApp",
+  "version": "1.0.0",
+  "description": "Final Year Project, which is an android app that presents one to one player quiz to  learn the programming languages",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RabbiaJahangir/ProgrammingQuizLearningApp.git"
+  },
+  "keywords": [
+    "fyp",
+    "android",
+    "app",
+    "quiz",
+    "learning",
+    "programming",
+    "languages",
+    "express",
+    "socket.io",
+    "socket",
+    "programming"
+  ],
+  "author": "Rabbia Jahangir",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RabbiaJahangir/ProgrammingQuizLearningApp/issues"
+  },
+  "homepage": "https://github.com/RabbiaJahangir/ProgrammingQuizLearningApp",
+  "dependencies": {
+    "express": "^4.13.3",
+    "socket.io": "^1.3.7"
+  }
+}
