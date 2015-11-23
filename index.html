@@ -8,18 +8,33 @@
 
 </head>
 <body>
+<p id="connection"></p>
 
-<div class="data"></div>
+<p id="match-status"></p>
+
 <p></p>
-<input class="btn" type="button" value="Connect"/>
+<input class="btn" type="button" value="Match Opponent"/>
+
+
 <script>
     var socket = io.connect('http://localhost');
     socket.on('connected', function (data) {
-        $('p').text(data.status);
+        $('#connection').text(data.connectedMsg);
+    });
+    socket.on('disconnected', function (data) {
+        $('#connection').text(data.disconnectedMsg);
+    });
+    socket.on('wait', function (data) {
+        $('#match-status').text(data.waitMsg);
+    });
+    socket.on('matched', function (data) {
+        $('#match-status').text(data.matchedMsg);
     });
     $('.btn').on('click', function () {
-        socket.emit('req', {msg: 'Player wants to be connected'});
+        socket.emit('match', {msg: 'Player wants to be connected'});
     });
+
 </script>
+
 </body>
 </html>
