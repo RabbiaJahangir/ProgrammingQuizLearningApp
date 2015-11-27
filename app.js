@@ -7,13 +7,14 @@
 var express = require('express'),
     app = express(),
     passport = require('passport'),
-    LocalStrategy = require('passport-local'),
+    LocalStrategy = require('passport-local').Strategy,
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     expressSession = require('express-session'),
     credentials = require('./credentials'),
     mongoose = require('mongoose'),
-    user = require('./models')(mongoose).user;
+    user = require('./models')(mongoose).user,
+    Logger = require('morgan');
 
 var PORT = 3000;
 
@@ -34,43 +35,82 @@ app.use(express.static(__dirname + '/public'));
 //cookieParser for parsing cookies and adding cookie variable in req obj for express session
 //passport for authentication
 //express session for creating sessions on server side, stores in MemoryStore
-app.use(bodyParser());
+app.use(Logger('dev'));
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser());
-app.use(passport.initialize());
 app.use(expressSession({
     cookie: {maxAge: credentials.cookie.cookieAge},
     saveUninitialized: true,
     resave: true,
     secret: credentials.cookie.secretForCookie
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 //Authentication middleware function for checking on each get and post request if the user is already logged in or not
 function isAuthenticated(req, res, next) {
     if (req.isAuthenticated())
         return next();
     else
-        res.redirect('/login');
+        res.send('/notLoggedIn');
 }
+
+
 app.get('/profile', function (req, res) {
- res.send('User Profile page');
+    res.send('User Profile page');
 });
 app.get('/signup', isAuthenticated, function (req, res) {
     res.send('User profile page');
 });
-app.post('/login', passport.authenticate('login-strategy-local', {
-    successRedirect: '/profile',
-    failureRedirect: '/failedLogin',
-    failureflash: true
-}));
-app.post('/signup', passport.authenticate('signup-strategy-local', {
-    successRedirect: '/profile',
-    failureRedirect: '/signup',
-    failureflash: true
-}));
+app.get('/login', isAuthenticated, function (req, res) {
+    res.send('User profile page');
+});
+//app.post('/login', passport.authenticate('login-strategy', {
+//    successRedirect: '/profile',
+//    failureRedirect: '/failedLogin',
+//}));
+//app.post('/signup', passport.authenticate('signup-strategy', {
+//    successRedirect: '/profile',
+//    failureRedirect: '/signup',
+//}));
+
+app.post('/login', function (req, res, next) {
+    passport.authenticate('login-strategy', function (err, user, info) {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.json({loggedIn: "false"});
+        }
+        req.logIn(user, function (err) {
+            if (err) {
+                return next(err);
+            }
+            return res.json({loggedIn: "true"});
+        });
+    })(req, res, next);
+});
+app.post('/signup', function (req, res, next) {
+    passport.authenticate('signup-strategy', function (err, user, info) {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            return res.json({signedUp: "false"});
+        }
+        req.logIn(user, function (err) {
+            if (err) {
+                return next(err);
+            }
+            return res.json({signedUp: "true"});
+        });
+    })(req, res, next);
+});
 app.get('/logout', function (req, res) {
     req.logout();
     res.redirect('/');
 });
-
 
 /*----Authentication code starts here----*/
 
@@ -83,7 +123,7 @@ passport.deserializeUser(function (id, done) {
     });
 });
 
-passport.use('signup-strategy-local', new LocalStrategy({
+passport.use('signup-strategy', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
     passReqToCallback: true
@@ -108,7 +148,7 @@ passport.use('signup-strategy-local', new LocalStrategy({
     });
 }));
 
-passport.use('login-strategy-local', new LocalStrategy({
+passport.use('login-strategy', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
     passReqToCallback: true
@@ -124,7 +164,7 @@ passport.use('login-strategy-local', new LocalStrategy({
         if (!member.comparePassword(password)) {
             return done(null, false);
         }
-        return done(null, user);
+        return done(null, member);
     });
 }));
 
