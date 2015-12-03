@@ -45,7 +45,12 @@ app.use(expressSession({
     resave: true,
     secret: credentials.cookie.secretForCookie
 }));
-
+//Request cookies logger
+app.use(function (req, res, next) {
+    console.log(req.cookies);
+    console.log(req.headers);
+    next();
+});
 app.use(passport.initialize());
 app.use(passport.session());
 //Authentication middleware function for checking on each get and post request if the user is already logged in or not
@@ -56,6 +61,16 @@ function isAuthenticated(req, res, next) {
         res.send('/notLoggedIn');
 }
 
+app.get('/', function (req, res) {
+    res.send("hey");
+});
+function authenticateUser(req, res, next) {
+    if (req.isAuthenticated())
+        res.json({authenticated: "true"});
+    else
+        res.json({authenticated: "false"});
+}
+app.get('/authenticate', authenticateUser);
 
 app.get('/profile', function (req, res) {
     res.send('User Profile page');
