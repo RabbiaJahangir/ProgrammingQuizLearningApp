@@ -124,7 +124,7 @@ app.post('/signup', function (req, res, next) {
 });
 app.get('/logout', function (req, res) {
     req.logout();
-    res.redirect('/');
+        res.json({loggedOut:"true"});
 });
 
 /*----Authentication code starts here----*/
