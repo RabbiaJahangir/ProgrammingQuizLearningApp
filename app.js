@@ -6,8 +6,6 @@
 
 var express = require('express'),
     app = express(),
-    passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy,
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     expressSession = require('express-session'),
@@ -15,6 +13,11 @@ var express = require('express'),
     mongoose = require('mongoose'),
     user = require('./models')(mongoose).user,
     Logger = require('morgan');
+
+
+require('./authentication/authenticate');
+require('./authentication/authenticate-routes');
+
 
 var PORT = 3000;
 
@@ -53,143 +56,12 @@ app.use(function (req, res, next) {
 });
 app.use(passport.initialize());
 app.use(passport.session());
-//Authentication middleware function for checking on each get and post request if the user is already logged in or not
-function isAuthenticated(req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-    else
-        res.send('/notLoggedIn');
-}
-
-app.get('/', function (req, res) {
-    res.send("hey");
-});
-function authenticateUser(req, res, next) {
-    if (req.isAuthenticated())
-        res.json({authenticated: "true"});
-    else
-        res.json({authenticated: "false"});
-}
-app.get('/authenticate', authenticateUser);
-
-app.get('/profile', function (req, res) {
-    res.send('User Profile page');
-});
-app.get('/signup', isAuthenticated, function (req, res) {
-    res.send('User profile page');
-});
-app.get('/login', isAuthenticated, function (req, res) {
-    res.send('User profile page');
-});
-//app.post('/login', passport.authenticate('login-strategy', {
-//    successRedirect: '/profile',
-//    failureRedirect: '/failedLogin',
-//}));
-//app.post('/signup', passport.authenticate('signup-strategy', {
-//    successRedirect: '/profile',
-//    failureRedirect: '/signup',
-//}));
-
-app.post('/login', function (req, res, next) {
-    passport.authenticate('login-strategy', function (err, user, info) {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            return res.json({loggedIn: "false"});
-        }
-        req.logIn(user, function (err) {
-            if (err) {
-                return next(err);
-            }
-            return res.json({loggedIn: "true"});
-        });
-    })(req, res, next);
-});
-app.post('/signup', function (req, res, next) {
-    passport.authenticate('signup-strategy', function (err, user, info) {
-        if (err) {
-            return next(err);
-        }
-        if (!user) {
-            return res.json({signedUp: "false"});
-        }
-        req.logIn(user, function (err) {
-            if (err) {
-                return next(err);
-            }
-            return res.json({signedUp: "true"});
-        });
-    })(req, res, next);
-});
-app.get('/logout', function (req, res) {
-    req.logout();
-        res.json({loggedOut:"true"});
-});
-
-/*----Authentication code starts here----*/
-
-passport.serializeUser(function (user, done) {
-    done(null, user.id);
-});
-passport.deserializeUser(function (id, done) {
-    user.findById(id, function (err, user) {
-        done(err, user);
-    });
-});
-
-passport.use('signup-strategy', new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password',
-    passReqToCallback: true
-}, function (req, email, password, done) {
-    user.findOne({'email': email}, function (err, member) {
-        if (err) {
-            return done(err);
-        }
-        if (member) {
-            return done(null, false);
-        } else {
-            var newPlayer = new user();
-            newPlayer.email = email;
-            newPlayer.password = newPlayer.createPasswordHash(password);
-            newPlayer.save(function (err) {
-                if (err) {
-                    throw err;
-                }
-                return done(null, newPlayer);
-            });
-        }
-    });
-}));
-
-passport.use('login-strategy', new LocalStrategy({
-    usernameField: 'email',
-    passwordField: 'password',
-    passReqToCallback: true
-}, function (req, email, password, done) {
-    console.log("inside authentication");
-    user.findOne({'email': email}, function (err, member) {
-        if (err) {
-            return done(err);
-        }
-        if (!member) {
-            return done(null, false);
-        }
-        if (!member.comparePassword(password)) {
-            return done(null, false);
-        }
-        return done(null, member);
-    });
-}));
 
 
 // starts the server
 app.listen(PORT, function () {
     console.log('Server up and running on port: ' + PORT);
 });
-
-/*----Authentication code ends here----*/
 
 
 
