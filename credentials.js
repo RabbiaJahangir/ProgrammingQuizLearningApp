@@ -8,6 +8,6 @@ module.exports = {
         cookieAge: 2592000000
     },
     mongo: {
-        dbConnectionString: 'mongodb://localhost:27017/Quizr'
+        dbConnectionString: "mongodb://rabbiaumer:inkpot9090@ds011459.mlab.com:11459/quizr"
     }
 }
