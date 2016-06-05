@@ -7,6 +7,8 @@
 var express = require('express'),
     app = express(),
     bodyParser = require('body-parser'),
+    passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy,
     cookieParser = require('cookie-parser'),
     expressSession = require('express-session'),
     credentials = require('./credentials'),
@@ -15,9 +17,8 @@ var express = require('express'),
     Logger = require('morgan');
 
 
-require('./authentication/authenticate');
-require('./authentication/authenticate-routes');
-
+var authenticate = require('./authentication/authenticate');
+require('./authentication/authenticate-routes')(app, passport);
 
 var PORT = 3000;
 
@@ -49,20 +50,22 @@ app.use(expressSession({
     secret: credentials.cookie.secretForCookie
 }));
 //Request cookies logger
-app.use(function (req, res, next) {
-    console.log(req.cookies);
-    console.log(req.headers);
-    next();
-});
+// app.use(function (req, res, next) {
+//     console.log(req.cookies);
+//     console.log(req.headers);
+//     next();
+// });
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get("/", function (req, res) {
+    res.send("hello");
+});
 
 // starts the server
 app.listen(PORT, function () {
     console.log('Server up and running on port: ' + PORT);
 });
-
 
 
 /* server = require('http').Server(app),
