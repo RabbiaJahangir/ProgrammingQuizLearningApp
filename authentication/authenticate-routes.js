@@ -1,7 +1,7 @@
 /**
  * Created by RabbiaUmer on 6/2/16.
  */
-module.exports = function () {
+module.exports = function (app, passport) {
 //Authentication middleware function for checking on each get and post request if the user is already logged in or not
     function isAuthenticated(req, res, next) {
         if (req.isAuthenticated())
