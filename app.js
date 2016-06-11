@@ -17,10 +17,10 @@ var express = require('express'),
     Logger = require('morgan');
 
 
-var authenticate = require('./authentication/authenticate');
+require('./authentication/authenticate')(passport, LocalStrategy);
 require('./authentication/authenticate-routes')(app, passport);
 
-var PORT = 3000;
+var PORT = 8080;
 
 //mongoose connectivity
 mongoose.connect(credentials.mongo.dbConnectionString);
