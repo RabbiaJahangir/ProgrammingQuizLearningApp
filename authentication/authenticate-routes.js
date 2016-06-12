@@ -58,6 +58,9 @@ module.exports = function (app, passport) {
     });
     app.post('/signup', function (req, res, next) {
         passport.authenticate('signup-strategy', function (err, user, info) {
+            console.log("logging from insie authenticate");
+            console.log(user);
+            console.log(req.body);
             if (err) {
                 return next(err);
             }

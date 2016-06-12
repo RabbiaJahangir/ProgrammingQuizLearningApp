@@ -13,12 +13,9 @@ var express = require('express'),
     expressSession = require('express-session'),
     credentials = require('./credentials'),
     mongoose = require('mongoose'),
-    user = require('./models')(mongoose).user,
     Logger = require('morgan');
 
-
-require('./authentication/authenticate')(passport, LocalStrategy);
-require('./authentication/authenticate-routes')(app, passport);
+app.use(Logger('dev'));
 
 var PORT = 8080;
 
@@ -39,10 +36,10 @@ app.use(express.static(__dirname + '/public'));
 //cookieParser for parsing cookies and adding cookie variable in req obj for express session
 //passport for authentication
 //express session for creating sessions on server side, stores in MemoryStore
-app.use(Logger('dev'));
+
+app.use(cookieParser());
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({extended: false}))
-app.use(cookieParser());
 app.use(expressSession({
     cookie: {maxAge: credentials.cookie.cookieAge},
     saveUninitialized: true,
@@ -61,13 +58,13 @@ app.use(passport.session());
 app.get("/", function (req, res) {
     res.send("hello");
 });
-
 // starts the server
 app.listen(PORT, function () {
     console.log('Server up and running on port: ' + PORT);
 });
 
-
+require('./authentication/authenticate')(passport, LocalStrategy, mongoose);
+require('./authentication/authenticate-routes')(app, passport);
 /* server = require('http').Server(app),
  io = require('socket.io')(server),
  match = require('./match')();

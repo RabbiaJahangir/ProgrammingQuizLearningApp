@@ -2,7 +2,11 @@
  * Created by RabbiaUmer on 6/2/16.
  */
 
-module.exports = function (passport, LocalStrategy) {
+module.exports = function (passport, LocalStrategy, mongoose) {
+
+    var user = require("../models/user")(mongoose);
+    console.log(user);
+    console.log("------------");
 
     /*----Authentication code starts here----*/
 
@@ -20,11 +24,15 @@ module.exports = function (passport, LocalStrategy) {
         passwordField: 'password',
         passReqToCallback: true
     }, function (req, email, password, done) {
+        console.log("inside signup strategy");
         user.findOne({'email': email}, function (err, member) {
+            console.log("inside user query");
             if (err) {
+                console.log(err);
                 return done(err);
             }
             if (member) {
+                console.log(memeber);
                 return done(null, false);
             } else {
                 var newPlayer = new user();
