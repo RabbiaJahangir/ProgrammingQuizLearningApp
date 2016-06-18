@@ -20,5 +20,5 @@ module.exports = function (mongoose) {
     };
 
 
-    return mongoose.model('User', user);
+    return  mongoose.model('User', user);
 }
