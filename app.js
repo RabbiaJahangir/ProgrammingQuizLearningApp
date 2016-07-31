@@ -6,6 +6,8 @@
 
 var express = require('express'),
     app = express(),
+    server = require('http').Server(app),
+    io = require('socket.io')(server),
     bodyParser = require('body-parser'),
     passport = require('passport'),
     LocalStrategy = require('passport-local').Strategy,
@@ -17,7 +19,7 @@ var express = require('express'),
 
 app.use(Logger('dev'));
 
-var PORT = 8080;
+var PORT = 8000;
 
 //mongoose connectivity
 mongoose.connect(credentials.mongo.dbConnectionString);
@@ -67,12 +69,12 @@ app.get("/", function (req, res) {
     res.send("hello");
 });
 // starts the server
-app.listen(PORT, function () {
+server.listen(PORT, function () {
     console.log('Server up and running on port: ' + PORT);
 });
 
 require('./authentication/authenticate')(passport, LocalStrategy, mongoose);
-require('./authentication/authenticate-routes')(app, passport);
+require('./routes/authenticate-routes')(app, passport);
 /* server = require('http').Server(app),
  io = require('socket.io')(server),
  match = require('./match')();
