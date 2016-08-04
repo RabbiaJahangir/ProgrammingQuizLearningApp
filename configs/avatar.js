@@ -16,7 +16,7 @@ module.exports = {
         link: 'img/basketball_man.png'
     },
     av_05: {
-        link: 'Bellboy_2.png'
+        link: 'img/Bellboy_2.png'
     },
     av_06: {
         link: 'img/Bellboy.png'
@@ -51,31 +51,31 @@ module.exports = {
     av_16: {
         link: 'img/engineering_woman_blonde_material.png'
     },
-    av_16: {
+    av_17: {
         link: 'img/engineering2.png'
     },
-    av_16: {
+    av_18: {
         link: 'img/football_man.png'
     },
-    av_16: {
+    av_19: {
         link: 'img/Harry_Potter_hufflepuff.png'
     },
-    av_16: {
+    av_20: {
         link: 'img/hittler.png'
     },
-    av_16: {
+    av_21: {
         link: 'img/japanese.png'
     },
-    av_17: {
+    av_22: {
         link: 'img/man_hispanic.png'
     },
-    av_18: {
+    av_23: {
         link: 'img/matrix_agent_smith_material.png'
     },
-    av_19: {
+    av_24: {
         link: 'img/matrix_trinity_material.png'
     },
-    av_20: {
+    av_25: {
         link: 'img/paramedic_woman_hispanic_material.png'
     }
 }
