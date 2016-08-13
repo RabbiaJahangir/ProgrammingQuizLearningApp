@@ -75,7 +75,7 @@ server.listen(PORT, function () {
 
 require('./authentication/authenticate')(passport, LocalStrategy, mongoose);
 require('./routes/authenticate-routes')(app, passport);
-require('./routes/avatar-routes');
+require('./routes/avatar-routes')(app);
 
 
 /* server = require('http').Server(app),
