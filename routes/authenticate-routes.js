@@ -17,9 +17,6 @@ module.exports = function (app, passport) {
             res.json({authenticated: "false"});
     }
 
-    app.get('/', function (req, res) {
-        res.send("hey");
-    });
     app.get('/authenticate', authenticateUser);
 
     app.get('/profile', function (req, res) {
