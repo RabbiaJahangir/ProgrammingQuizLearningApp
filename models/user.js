@@ -6,19 +6,19 @@ var bcrypt = require('bcrypt');
 
 module.exports = function (mongoose) {
 
-    var user = mongoose.Schema({
-        email: String,
-        password: String
-    });
+  var user = mongoose.Schema({
+    email: String,
+    password: String
+  });
 
-    user.methods.createPasswordHash = function (pass) {
-        return bcrypt.hashSync(pass, 8);
-    };
-    user.methods.comparePassword = function (pass) {
-        var isMatched = bcrypt.compareSync(pass, this.password);
-        return isMatched;
-    };
+  user.methods.createPasswordHash = function (pass) {
+    return bcrypt.hashSync(pass, 8);
+  };
 
+  user.methods.comparePassword = function (pass) {
+    var isMatched = bcrypt.compareSync(pass, this.password);
+    return isMatched;
+  };
 
-    return  mongoose.model('User', user);
-}
+  return mongoose.model('User', user);
+};

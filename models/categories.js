@@ -5,9 +5,9 @@
 
 module.exports = function (mongoose) {
 
-    var categories = mongoose.Schema({
-        name: String
-    });
+  var categories = mongoose.Schema({
+    name: String
+  });
 
-    return mongoose.model('Categories', categories);
+  return mongoose.model('Categories', categories);
 };

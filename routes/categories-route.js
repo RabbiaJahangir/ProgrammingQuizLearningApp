@@ -4,13 +4,15 @@
 
 module.exports = function (app, mongoose) {
 
-    var cat = require('../models/categories')(mongoose);
+  var cat = require('../models/categories')(mongoose);
 
-    app.get('/categories', function (req, res) {
-        cat.find({}, function (err, cats) {
-            if (!err) {
-                res.send(cats);
-            }
-        });
+  app.get('/categories', function (req, res) {
+
+    cat.find({}, function (err, cats) {
+      if (!err) {
+        res.send(cats);
+      }
     });
-}
+
+  });
+};
