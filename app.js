@@ -74,16 +74,30 @@ app.get("/", function (req, res) {
   res.send("hello");
 });
 
-// starts the server
-server.listen(PORT, function () {
-  console.log('Server up and running on port: ' + PORT);
-});
-
 require('./authentication/authenticate')(passport, LocalStrategy, mongoose);
 require('./routes/authenticate-routes')(app, passport);
 require('./routes/avatar-routes')(app);
 require('./routes/categories-route')(app, mongoose);
 
+// starts the server
+server.listen(PORT, function () {
+  console.log('Server up and running on port: ' + PORT);
+});
+
+var players = [];
+io.on('connection', function (socket) {
+
+  players.push(socket);
+  console.log("Got some connection");
+  io.emit('noOfPlayers', {no: players.length});
+
+  socket.on('disconnect', function () {
+    console.log("player disconnected");
+    players.splice(players.indexOf(socket), 1);
+    io.emit('noOfPlayers', {no: players.length});
+  });
+
+});
 
 /* server = require('http').Server(app),
  io = require('socket.io')(server),

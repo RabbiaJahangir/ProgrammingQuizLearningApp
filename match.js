@@ -7,9 +7,7 @@
 var players = [];
 var connRequestQueue = [];
 
-var foo = "Umer";
 module.exports = function () {
-
 
     function storePlayer(socket) {
         players.push(socket);
@@ -38,7 +36,7 @@ module.exports = function () {
         player.emit("wait", {waitMsg: "Please wait, Looking for an opponent...."});
         connRequestQueue.push(player);
         var res = connectPlayer(player);
-        if (res != null) {
+        if (res !== null) {
             console.log("Player matched");
             player.emit('matched', {matchedMsg: "Your opponent found"});
         }
@@ -80,7 +78,7 @@ module.exports = function () {
     }
 
 
-    return {storePlayer: storePlayer, destroyPlayer: destroyPlayer, addToWaiting: addToWaiting}
+    return {storePlayer: storePlayer, destroyPlayer: destroyPlayer, addToWaiting: addToWaiting};
 
 }
 
