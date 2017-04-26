@@ -26,11 +26,29 @@ mongoose.connect(credentials.mongo.dbConnectionString);
 var db = mongoose.connection;
 
 db.on('error', function (err) {
-  console.log('There occured an error connecting to the mongodb');
+  console.info('There occured an error connecting to the mongodb');
 });
 
 db.on('open', function () {
-  console.log("Connection to mongodb is established");
+  console.info("Connection to mongodb is established");
+});
+
+// Try to re connect on disconnected
+db.on('disconnected', function () {
+  console.info("Re connecting to mongodb");
+  mongoose.connect(credentials.mongo.dbConnectionString);
+});
+
+// Middleware to be executed on every incoming request, for checking if the connection to DB is already established
+app.use(function (req, res, next) {
+
+  // mongoose.connection.readyState returns status codes
+  // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting, 4 = invalid credentials
+  if(mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3){
+    console.info("Re connecting to mongodb");
+    mongoose.connect(credentials.mongo.dbConnectionString);
+  }
+  next();
 });
 
 app.use(express.static(__dirname + '/public'));
