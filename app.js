@@ -11,14 +11,20 @@ var express = require('express'),
   bodyParser = require('body-parser'),
   credentials = require('./credentials'),
   mongoose = require('mongoose'),
-  Logger = require('morgan');
+  Logger = require('morgan'),
+  jwt = require('jsonwebtoken');
 
-app.use(Logger('dev'));
+
+// -------====== Local Files Require To Include in the app ======-------
+require('./routes/avatar-routes')(app);
+require('./routes/categories-route')(app, mongoose);
 
 var PORT = 8000;
 
+// -------======= MongoDB Stuff (using Mongoose) ========------
 //mongoose connectivity
-mongoose.connect(credentials.mongo.dbConnectionString);
+
+mongoose.connect(credentials.dbConnectionString);
 var db = mongoose.connection;
 
 db.on('error', function (err) {
@@ -35,9 +41,12 @@ db.on('disconnected', function () {
   mongoose.connect(credentials.dbConnectionString);
 });
 
+// ------=========== Middlewares ==========-----------
+
+app.use(Logger('dev'));
+
 // Middleware to be executed on every incoming request, for checking if the connection to DB is already established
 app.use(function (req, res, next) {
-
   // mongoose.connection.readyState returns status codes
   // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting, 4 = invalid credentials
   if (mongoose.connection.readyState === 0 || mongoose.connection.readyState === 3) {
@@ -63,12 +72,13 @@ app.all('*', function (req, res, next) {
   next();
 });
 
+
+// -------======== Routes =========----------
+
 app.get("/", function (req, res) {
   res.send("hello");
 });
 
-require('./routes/avatar-routes')(app);
-require('./routes/categories-route')(app, mongoose);
 
 // starts the server
 server.listen(PORT, function () {
