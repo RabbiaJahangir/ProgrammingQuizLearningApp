@@ -19,7 +19,7 @@ var express = require('express'),
 require('./routes/avatar-routes')(app);
 require('./routes/categories-route')(app, mongoose);
 
-var PORT = 8000;
+var PORT = process.env.PORT || 8000;
 
 // -------======= MongoDB Stuff (using Mongoose) ========------
 //mongoose connectivity
