@@ -80,7 +80,7 @@ app.get("/", function (req, res) {
 // -------====== Local Files Require To Include in the app ======-------
 require('./routes/avatar-routes')(app);
 require('./routes/categories-route')(app, mongoose);
-require('./routes/authenticate-routes')(app, express, jwt);
+require('./routes/authenticate-routes')(app, express, jwt, mongoose);
 
 
 // starts the server
