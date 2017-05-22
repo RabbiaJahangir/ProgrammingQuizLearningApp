@@ -2,16 +2,15 @@
  * Created by RabbiaUmer on 6/2/16.
  */
 
-var User = require('./../models/user');
+module.exports = function (app, express, jwt, mongoose) {
 
-module.exports = function (app, express, jwt) {
+  var User = require('./../models/user')(mongoose);
 
   // get an instance of the router for auth routes
   var authRoutes = express.Router();
 
   // route to authenticate a user (POST http://localhost:8080/api/authenticate)
   authRoutes.post('/authenticate', function (req, res) {
-
     // find the user
     User.findOne({
       email: req.body.email
