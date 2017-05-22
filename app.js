@@ -14,11 +14,6 @@ var express = require('express'),
   Logger = require('morgan'),
   jwt = require('jsonwebtoken');
 
-
-// -------====== Local Files Require To Include in the app ======-------
-require('./routes/avatar-routes')(app);
-require('./routes/categories-route')(app, mongoose);
-
 // ------====== configuration ========-------
 
 var PORT = process.env.PORT || 8000;
@@ -81,6 +76,11 @@ app.all('*', function (req, res, next) {
 app.get("/", function (req, res) {
   res.send("hello");
 });
+
+// -------====== Local Files Require To Include in the app ======-------
+require('./routes/avatar-routes')(app);
+require('./routes/categories-route')(app, mongoose);
+require('./routes/authenticate-routes')(app, express, jwt);
 
 
 // starts the server
