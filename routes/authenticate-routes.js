@@ -23,14 +23,14 @@ module.exports = function (app, express, jwt, mongoose) {
       } else if (user) {
 
         // check if password matches
-        if (user.password !== req.body.password) {
+        if (!user.comparePassword(req.body.password)) {
           res.json({success: false, message: 'Authentication failed. Wrong password.'});
         } else {
 
           // if user is found and password is right
           // create a token
-          var token = jwt.sign(user, app.get('superSecret'), {
-            expiresInMinutes: 1440 // expires in 24 hours
+          var token = jwt.sign(user, app.get('appSecret'), {
+            expiresIn: 60 * 60 * 24  // expires in 24 hours
           });
 
           // return the information including token as JSON
@@ -46,6 +46,52 @@ module.exports = function (app, express, jwt, mongoose) {
     });
   });
 
+  // Signup route
+  authRoutes.post('/signup', function (req, res) {
+
+    User.findOne({
+      email: req.body.email
+    }, function (err, member) {
+
+      if (err) {
+        throw err;
+      }
+
+      if (member) {
+        res.status(403).json({
+          success: false,
+          message: "User already exists"
+        });
+      } else {
+
+        var newPlayer = new User();
+        newPlayer.email = req.body.email;
+        newPlayer.password = newPlayer.createPasswordHash(req.body.password);
+        newPlayer.save(function (err, user) {
+          console.log(err);
+          if (err) {
+            throw err;
+          }
+
+          // if player/user has been created, create a new token
+          // create a token
+          var token = jwt.sign(user, app.get('appSecret'), {
+            expiresIn: 60 * 60 * 24 // expires in 24 hours
+          });
+
+          res.status(200).json({
+            success: true,
+            message: "Signed up successfully",
+            token: token
+          });
+
+        });
+      }
+
+    });
+
+  });
+
   // route middleware to verify a token
   authRoutes.use(function (req, res, next) {
 
@@ -57,7 +103,7 @@ module.exports = function (app, express, jwt, mongoose) {
     if (token) {
 
       // verifies secret and checks exp
-      jwt.verify(token, app.get('superSecret'), function (err, decoded) {
+      jwt.verify(token, app.get('appSecret'), function (err, decoded) {
         if (err) {
           return res.json({success: false, message: 'Failed to authenticate token.'});
         } else {
@@ -78,6 +124,8 @@ module.exports = function (app, express, jwt, mongoose) {
 
     }
   });
+
+  // put the routes here that needs to be protected
 
 
   app.use('/auth', authRoutes);
