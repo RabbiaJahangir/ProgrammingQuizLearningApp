@@ -10,7 +10,7 @@ module.exports = function (app, express, jwt, mongoose) {
   var authRoutes = express.Router();
 
   // route to authenticate a user (POST http://localhost:8080/api/authenticate)
-  authRoutes.post('/authenticate', function (req, res) {
+  authRoutes.post('/login', function (req, res) {
     // find the user
     User.findOne({
       email: req.body.email
