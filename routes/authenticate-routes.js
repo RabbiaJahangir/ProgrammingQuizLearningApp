@@ -6,11 +6,11 @@ module.exports = function (app, express, jwt, mongoose) {
 
   var User = require('./../models/user')(mongoose);
 
-  // get an instance of the router for auth routes
-  var authRoutes = express.Router();
+  // // get an instance of the router for auth routes
+  // var authRoutes = express.Router();
 
   // route to authenticate a user (POST http://localhost:8080/api/authenticate)
-  authRoutes.post('/login', function (req, res) {
+  app.post('/login', function (req, res) {
     // find the user
     User.findOne({
       email: req.body.email
@@ -47,7 +47,7 @@ module.exports = function (app, express, jwt, mongoose) {
   });
 
   // Signup route
-  authRoutes.post('/signup', function (req, res) {
+  app.post('/signup', function (req, res) {
 
     User.findOne({
       email: req.body.email
@@ -93,12 +93,12 @@ module.exports = function (app, express, jwt, mongoose) {
   });
 
   // route middleware to verify a token
-  authRoutes.use(function (req, res, next) {
+  app.use(function (req, res, next) {
 
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     // Note: the above req.body object is attached by bodyParser from the body parser middleware in app.js
-
+    
     // decode token
     if (token) {
 
@@ -125,10 +125,12 @@ module.exports = function (app, express, jwt, mongoose) {
     }
   });
 
+  app.get('/test', function (req, res) {
+    res.send("something");
+  })
+
   // put the routes here that needs to be protected
 
-
-  app.use('/auth', authRoutes);
 
 };
 
