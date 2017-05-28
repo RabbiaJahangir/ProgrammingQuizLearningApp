@@ -65,9 +65,11 @@ app.all('*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', req.headers.origin);
   res.header('Access-Control-Allow-Credentials', true);
   res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
-
-  next();
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With, X-HTTP-Method-Override, Content-Type, x-access-token, Accept');
+  if (req.method === "OPTIONS")
+    res.sendStatus(200);
+  else
+    next();
 });
 
 
@@ -79,8 +81,8 @@ app.get("/", function (req, res) {
 
 // -------====== Local Files Require To Include in the app ======-------
 require('./routes/avatar-routes')(app);
-require('./routes/categories-route')(app, mongoose);
 require('./routes/authenticate-routes')(app, express, jwt, mongoose);
+require('./routes/categories-route')(app, mongoose);
 
 
 // starts the server
