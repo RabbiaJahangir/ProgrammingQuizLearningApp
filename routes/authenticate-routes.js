@@ -49,46 +49,60 @@ module.exports = function (app, express, jwt, mongoose) {
   // Signup route
   app.post('/signup', function (req, res) {
 
-    User.findOne({
-      email: req.body.email
-    }, function (err, member) {
+    // check to make sure if there is something sent in abody
+    if (Object.keys(req.body).length) {
+      User.findOne({
+        email: req.body.email
+      }, function (err, member) {
 
-      if (err) {
-        throw err;
-      }
+        if (err) {
+          throw err;
+        }
 
-      if (member) {
-        res.status(403).json({
-          success: false,
-          message: "User already exists"
-        });
-      } else {
-
-        var newPlayer = new User();
-        newPlayer.email = req.body.email;
-        newPlayer.password = newPlayer.createPasswordHash(req.body.password);
-        newPlayer.save(function (err, user) {
-          console.log(err);
-          if (err) {
-            throw err;
-          }
-
-          // if player/user has been created, create a new token
-          // create a token
-          var token = jwt.sign(user, app.get('appSecret'), {
-            expiresIn: 60 * 60 * 24 // expires in 24 hours
+        if (member) {
+          res.status(403).json({
+            success: false,
+            message: "User already exists"
           });
+        } else {
 
-          res.status(200).json({
-            success: true,
-            message: "Signed up successfully",
-            token: token
+          var defaultUserLevel = 0;
+
+          var newPlayer = new User();
+          newPlayer.firstName = req.firstName;
+          newPlayer.lastName = req.lastName;
+          newPlayer.email = req.body.email;
+          newPlayer.password = newPlayer.createPasswordHash(req.body.password);
+          newPlayer.level = defaultUserLevel;
+          newPlayer.save(function (err, user) {
+            console.log(err);
+            if (err) {
+              throw err;
+            }
+
+            // if player/user has been created, create a new token
+            // create a token
+            var token = jwt.sign(user, app.get('appSecret'), {
+              expiresIn: 60 * 60 * 24 // expires in 24 hours
+            });
+
+            res.status(200).json({
+              success: true,
+              message: "Signed up successfully",
+              token: token
+            });
+
           });
+        }
 
-        });
-      }
+      });
+    } else {
+      res.status(403).json({
+        success: false,
+        message: "no data sent"
+      });
+    }
 
-    });
 
   });
 
@@ -98,7 +112,7 @@ module.exports = function (app, express, jwt, mongoose) {
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     // Note: the above req.body object is attached by bodyParser from the body parser middleware in app.js
-    
+
     // decode token
     if (token) {
 
