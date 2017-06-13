@@ -7,8 +7,11 @@ var bcrypt = require('bcrypt');
 module.exports = function (mongoose) {
 
   var user = mongoose.Schema({
+    firstName: String,
+    lastName: String,
     email: String,
-    password: String
+    password: String,
+    level: Number
   });
 
   user.methods.createPasswordHash = function (pass) {
