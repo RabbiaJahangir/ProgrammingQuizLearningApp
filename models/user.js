@@ -11,7 +11,8 @@ module.exports = function (mongoose) {
     lastName: String,
     email: String,
     password: String,
-    level: Number
+    level: Number,
+    avatar: String
   });
 
   user.methods.createPasswordHash = function (pass) {
