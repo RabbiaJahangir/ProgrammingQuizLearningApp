@@ -106,10 +106,6 @@ module.exports = function (app, express, jwt, mongoose) {
 
   });
 
-  app.get('/test', function (req, res) {
-    res.send("something");
-  })
-
   // route middleware to verify a token
   app.use(function (req, res, next) {
 
@@ -143,7 +139,7 @@ module.exports = function (app, express, jwt, mongoose) {
     }
   });
 
-  // put the routes here that needs to be protected
+  // PUT THE ROUTES HERE THAT NEEDS TO BE PROTECTED
 
 
 };
