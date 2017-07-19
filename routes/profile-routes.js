@@ -14,6 +14,7 @@ module.exports = function (app, mongoose, jwt) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     var decodedToken = jwt.decode(token);
     var host = req.headers.host;
+    console.log(decodedToken._doc.avatar);
 
     var userInfo = {
       email: decodedToken._doc.email,
