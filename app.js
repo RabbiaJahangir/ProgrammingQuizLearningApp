@@ -81,7 +81,7 @@ app.get("/", function (req, res) {
 
 // -------====== Local Files Require To Include in the app ======-------
 require('./routes/authenticate-routes')(app, express, jwt, mongoose);
-// any routes after above authenticate-routes will be protected by default
+// any routes after above authenticate-routes will be protected by default BECUASE OF USE MIDDLEWARE IN ABOVE REQUIRED FILE
 // need valid credential/token to access anything below
 require('./routes/avatar-routes')(app);
 require('./routes/categories-route')(app, mongoose);
