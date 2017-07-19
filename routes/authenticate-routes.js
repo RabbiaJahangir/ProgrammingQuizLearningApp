@@ -75,7 +75,6 @@ module.exports = function (app, express, jwt, mongoose) {
           newPlayer.password = newPlayer.createPasswordHash(req.body.password);
           newPlayer.level = defaultUserLevel;
           newPlayer.save(function (err, user) {
-            console.log(err);
             if (err) {
               throw err;
             }
