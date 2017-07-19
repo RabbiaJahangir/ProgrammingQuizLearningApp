@@ -85,6 +85,7 @@ require('./routes/authenticate-routes')(app, express, jwt, mongoose);
 // need valid credential/token to access anything below
 require('./routes/avatar-routes')(app);
 require('./routes/categories-route')(app, mongoose);
+require('./routes/profile-routes')(app, mongoose, jwt);
 
 
 // starts the server
