@@ -16,8 +16,8 @@ module.exports = function (app, mongoose, jwt) {
       firstName: decodedToken._doc.firstName,
       lastName: decodedToken._doc.lastName,
       level: decodedToken._doc.level,
-      host: req.headers.host
-    }
+      avatar: "http://" + req.headers.host + decodedToken._doc.avatar;
+  }
 
 
     res.send(userInfo);
