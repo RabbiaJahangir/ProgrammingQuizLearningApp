@@ -74,6 +74,10 @@ module.exports = function (app, express, jwt, mongoose) {
           newPlayer.email = req.body.email;
           newPlayer.password = newPlayer.createPasswordHash(req.body.password);
           newPlayer.level = defaultUserLevel;
+
+          // assigning the default picture, name of avatar is from configs/avatar.js
+          newPlayer.avatar = "av_12";
+
           newPlayer.save(function (err, user) {
             if (err) {
               throw err;
