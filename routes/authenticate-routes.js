@@ -69,8 +69,8 @@ module.exports = function (app, express, jwt, mongoose) {
           var defaultUserLevel = 0;
 
           var newPlayer = new User();
-          newPlayer.firstName = req.firstName;
-          newPlayer.lastName = req.lastName;
+          newPlayer.firstName = req.body.firstName;
+          newPlayer.lastName = req.body.lastName;
           newPlayer.email = req.body.email;
           newPlayer.password = newPlayer.createPasswordHash(req.body.password);
           newPlayer.level = defaultUserLevel;
