@@ -29,11 +29,6 @@ module.exports = function (app, user, jwt) {
     var decodedToken = jwt.decode(token);
     var host = req.headers.host;
 
-    // var host = req.headers.host;
-    // var avatarLinks = [];
-    // for (var avatar in avatarRefs) {
-    //   avatarLinks.push("http://" + host + "/" + avatarRefs[avatar].link);
-    // }
 
     User.findOne({'email': decodedToken._doc.email}, function (err, doc) {
       if (err)
@@ -42,7 +37,7 @@ module.exports = function (app, user, jwt) {
           message: "failed"
         });
 
-      doc.avatar = helper.generateAvatarLink(req.body.avatarName, host);
+      doc.avatar = req.body.avatarName;
       doc.save(function (err) {
         if (err) {
           res.send({
