@@ -6,7 +6,7 @@
 module.exports = function (app, mongoose, jwt) {
 
   var helper = require('../helper'),
-    User = require('../models/user');
+    User = require('../models/user')(mongoose);
 
   // var profile = require('./../models/user')(mongoose);
 
