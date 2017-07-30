@@ -20,7 +20,7 @@ module.exports = function (app, mongoose, jwt) {
       firstName: decodedToken._doc.firstName,
       lastName: decodedToken._doc.lastName,
       level: decodedToken._doc.level,
-      avatar: helper.getAvatarName(decodedToken._doc.avatar, host)
+      avatar: helper.generateAvatarLink(decodedToken._doc.avatar, host)
     };
 
     res.send(userInfo);
