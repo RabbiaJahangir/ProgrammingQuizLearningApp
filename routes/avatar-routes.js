@@ -18,14 +18,4 @@ module.exports = function (app) {
     }
     res.send(avatarLinks);
   });
-
-  app.post('/set-avatar', function (req, res) {
-    // var host = req.headers.host;
-    // var avatarLinks = [];
-    // for (var avatar in avatarRefs) {
-    //   avatarLinks.push("http://" + host + "/" + avatarRefs[avatar].link);
-    // }
-    res.send(req.body);
-  });
-
 };
