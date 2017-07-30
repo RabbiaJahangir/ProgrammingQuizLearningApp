@@ -32,6 +32,7 @@ module.exports = function (app, mongoose, jwt) {
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     var decodedToken = jwt.decode(token);
+    var host = req.headers.host;
 
     // var host = req.headers.host;
     // var avatarLinks = [];
@@ -39,17 +40,29 @@ module.exports = function (app, mongoose, jwt) {
     //   avatarLinks.push("http://" + host + "/" + avatarRefs[avatar].link);
     // }
 
-    User.findOneAndUpdate({'email': decodedToken._doc.email}, {'avatar': req.avatarName}, {upsert: true}, function (err, doc) {
+    User.findOne({'email': decodedToken._doc.email}, function (err, doc) {
       if (err)
         return res.send({
           success: false,
           message: "failed"
         });
 
-      res.send({
-        success: true,
-        message: "success"
+      doc.avatar = helper.generateAvatarLink(req.body.avatarName, host);
+      doc.save(function (err) {
+        if (err) {
+          res.send({
+            success: false,
+            message: "failed"
+          });
+        }
+        else {
+          res.send({
+            success: true,
+            message: "success"
+          });
+        }
       });
+
     });
   });
 
