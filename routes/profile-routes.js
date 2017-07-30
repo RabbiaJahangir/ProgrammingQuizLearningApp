@@ -17,8 +17,14 @@ module.exports = function (app, user, jwt) {
     var host = req.headers.host;
 
     User.findOne({'email': decodedToken._doc.email}, function (err, doc) {
-      if (!err)
-        res.send(doc);
+      if (err) {
+        return res.send({
+          success: false,
+          message: "failed"
+        });
+      }
+      doc.avatar = helper.generateAvatarLink(doc.avatar, host);
+      res.send(doc);
     });
   });
 
