@@ -3,10 +3,10 @@
  */
 
 
-module.exports = function (app, mongoose, jwt) {
+module.exports = function (app, user, jwt) {
 
   var helper = require('../helper'),
-    User = require('../models/user')(mongoose);
+    User = user;
 
   // var profile = require('./../models/user')(mongoose);
 

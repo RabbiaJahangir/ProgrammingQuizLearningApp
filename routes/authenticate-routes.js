@@ -2,9 +2,9 @@
  * Created by RabbiaUmer on 6/2/16.
  */
 
-module.exports = function (app, express, jwt, mongoose) {
+module.exports = function (app, express, jwt, user) {
 
-  var User = require('./../models/user')(mongoose);
+  var User = user;
 
   // // get an instance of the router for auth routes
   // var authRoutes = express.Router();

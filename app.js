@@ -79,13 +79,14 @@ app.get("/", function (req, res) {
   res.send("hello");
 });
 
+var user = require('./models/user')(mongoose);
 // -------====== Local Files Require To Include in the app ======-------
 require('./routes/avatar-routes')(app);
-require('./routes/authenticate-routes')(app, express, jwt, mongoose);
+require('./routes/authenticate-routes')(app, express, jwt, user);
 // any routes after above authenticate-routes will be protected by default BECUASE OF USE MIDDLEWARE IN ABOVE REQUIRED FILE
 // need valid credential/token to access anything below
 require('./routes/categories-route')(app, mongoose);
-require('./routes/profile-routes')(app, mongoose, jwt);
+require('./routes/profile-routes')(app, user, jwt);
 
 
 // starts the server
