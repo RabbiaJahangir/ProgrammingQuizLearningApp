@@ -5,7 +5,7 @@
 
 module.exports = function (app, mongoose, jwt) {
 
-  var avatarRefs = require('../configs/avatar');
+  var helper = require('../helper');
 
   // var profile = require('./../models/user')(mongoose);
 
@@ -14,15 +14,14 @@ module.exports = function (app, mongoose, jwt) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     var decodedToken = jwt.decode(token);
     var host = req.headers.host;
-    
+
     var userInfo = {
       email: decodedToken._doc.email,
       firstName: decodedToken._doc.firstName,
       lastName: decodedToken._doc.lastName,
       level: decodedToken._doc.level,
-      avatar: "http://" + host + "/" + avatarRefs[decodedToken._doc.avatar].link
-    }
-
+      avatar: helper.getAvatarName(decodedToken._doc.avatar, host)
+    };
 
     res.send(userInfo);
   });
