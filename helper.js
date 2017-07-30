@@ -1,9 +1,8 @@
 var avatarRefs = require('./configs/avatar');
 
-module.exports = function () {
 
-  function generateAvatarLink(avatarName, host) {
-    return "http://" + host + "/" + avatarRefs[avatarName].link;
-  }
-
+function generateAvatarLink(avatarName, host) {
+  return "http://" + host + "/" + avatarRefs[avatarName].link;
 }
+
+module.exports = {generateAvatarLink: generateAvatarLink};
