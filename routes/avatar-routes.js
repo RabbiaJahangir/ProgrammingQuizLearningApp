@@ -11,12 +11,15 @@ module.exports = function (app) {
     var host = req.headers.host;
     var avatarLinks = [];
     for (var avatar in avatarRefs) {
-      avatarLinks.push(helper.generateAvatarLink(avatar, host));
+      avatarLinks.push({
+        avatarUrl: helper.generateAvatarLink(avatar, host),
+        avatarName: avatar
+      });
     }
     res.send(avatarLinks);
   });
 
-  app.get('/set-avatar', function (req, res) {
+  app.post('/set-avatar', function (req, res) {
     // var host = req.headers.host;
     // var avatarLinks = [];
     // for (var avatar in avatarRefs) {
