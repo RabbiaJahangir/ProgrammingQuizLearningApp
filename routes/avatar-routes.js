@@ -2,7 +2,8 @@
  * Created by rabbiaumer on 8/3/16.
  */
 
-var avatarRefs = require('../configs/avatar');
+var helper = require('../helper'),
+  avatarRefs = require('../configs/avatar');
 
 module.exports = function (app) {
 
@@ -10,9 +11,18 @@ module.exports = function (app) {
     var host = req.headers.host;
     var avatarLinks = [];
     for (var avatar in avatarRefs) {
-      avatarLinks.push("http://" + host + "/" + avatarRefs[avatar].link);
+      avatarLinks.push(helper.generateAvatarLink(avatar, host));
     }
     res.send(avatarLinks);
+  });
+
+  app.get('/set-avatar', function (req, res) {
+    // var host = req.headers.host;
+    // var avatarLinks = [];
+    // for (var avatar in avatarRefs) {
+    //   avatarLinks.push("http://" + host + "/" + avatarRefs[avatar].link);
+    // }
+    res.send(req.body);
   });
 
 };
