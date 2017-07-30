@@ -16,15 +16,10 @@ module.exports = function (app, user, jwt) {
     var decodedToken = jwt.decode(token);
     var host = req.headers.host;
 
-    var userInfo = {
-      email: decodedToken._doc.email,
-      firstName: decodedToken._doc.firstName,
-      lastName: decodedToken._doc.lastName,
-      level: decodedToken._doc.level,
-      avatar: helper.generateAvatarLink(decodedToken._doc.avatar, host)
-    };
-
-    res.send(userInfo);
+    User.findOne({'email': decodedToken._doc.email}, function (err, doc) {
+      if (!err)
+        res.send(doc);
+    });
   });
 
   app.post('/set-avatar', function (req, res) {
