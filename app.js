@@ -87,6 +87,7 @@ require('./routes/authenticate-routes')(app, express, jwt, user);
 // need valid credential/token to access anything below
 require('./routes/categories-route')(app, mongoose);
 require('./routes/profile-routes')(app, user, jwt);
+require('./routes/competition-routes')(app);
 
 
 // starts the server
