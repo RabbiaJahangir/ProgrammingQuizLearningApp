@@ -13,10 +13,9 @@ module.exports = function (app, user, jwt) {
   app.get('/user-profile', function (req, res) {
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
-    var decodedToken = jwt.decode(token);
     var host = req.headers.host;
 
-    User.findOne({'email': decodedToken._doc.email}, function (err, doc) {
+    User.findOne({'email': req.decoded._doc.email}, function (err, doc) {
       if (err) {
         return res.send({
           success: false,
@@ -32,11 +31,10 @@ module.exports = function (app, user, jwt) {
 
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
-    var decodedToken = jwt.decode(token);
     var host = req.headers.host;
 
 
-    User.findOne({'email': decodedToken._doc.email}, function (err, doc) {
+    User.findOne({'email': req.decoded._doc.email}, function (err, doc) {
       if (err)
         return res.send({
           success: false,
