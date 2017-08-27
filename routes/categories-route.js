@@ -2,9 +2,7 @@
  * Created by Rabbia Umer on 7/14/16.
  */
 
-module.exports = function (app, mongoose) {
-
-  var cat = require('../models/categories')(mongoose);
+module.exports = function (app, cat) {
 
   app.get('/categories', function (req, res) {
 
