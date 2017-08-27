@@ -12,7 +12,7 @@ var express = require('express'),
   credentials = require('./credentials'),
   mongoose = require('mongoose'),
   Logger = require('morgan'),
-  jwt = require('jsonwebtoaken');
+  jwt = require('jsonwebtoken');
 
 // ------====== configuration ========-------
 
@@ -81,7 +81,7 @@ app.get("/", function (req, res) {
 
 // Requiring models
 var user = require('./models/user')(mongoose);
-var cat = require('../models/categories')(mongoose);
+var cat = require('./models/categories')(mongoose);
 
 // -------====== Local Files Require To Include in the app ======-------
 require('./routes/avatar-routes')(app);
