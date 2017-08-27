@@ -12,7 +12,7 @@ var express = require('express'),
   credentials = require('./credentials'),
   mongoose = require('mongoose'),
   Logger = require('morgan'),
-  jwt = require('jsonwebtoken');
+  jwt = require('jsonwebtoaken');
 
 // ------====== configuration ========-------
 
@@ -79,15 +79,18 @@ app.get("/", function (req, res) {
   res.send("hello");
 });
 
+// Requiring models
 var user = require('./models/user')(mongoose);
+var cat = require('../models/categories')(mongoose);
+
 // -------====== Local Files Require To Include in the app ======-------
 require('./routes/avatar-routes')(app);
 require('./routes/authenticate-routes')(app, express, jwt, user);
 // any routes after above authenticate-routes will be protected by default BECUASE OF USE MIDDLEWARE IN ABOVE REQUIRED FILE
 // need valid credential/token to access anything below
-require('./routes/categories-route')(app, mongoose);
+require('./routes/categories-route')(app, cat);
 require('./routes/profile-routes')(app, user, jwt);
-require('./routes/competition-routes')(app);
+require('./routes/competition-routes')(app, user);
 
 
 // starts the server
