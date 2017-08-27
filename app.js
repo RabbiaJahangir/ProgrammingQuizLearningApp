@@ -82,6 +82,7 @@ app.get("/", function (req, res) {
 // Requiring models
 var user = require('./models/user')(mongoose);
 var cat = require('./models/categories')(mongoose);
+var questions = require('./models/questions')(mongoose);
 
 // -------====== Local Files Require To Include in the app ======-------
 require('./routes/avatar-routes')(app);
@@ -90,7 +91,7 @@ require('./routes/authenticate-routes')(app, express, jwt, user);
 // need valid credential/token to access anything below
 require('./routes/categories-route')(app, cat);
 require('./routes/profile-routes')(app, user, jwt);
-require('./routes/competition-routes')(app, user);
+require('./routes/competition-routes')(app, user, questions);
 
 
 // starts the server
