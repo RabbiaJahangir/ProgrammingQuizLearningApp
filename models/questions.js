@@ -1,9 +1,10 @@
 module.exports = function (mongoose) {
 
   var questions = mongoose.Schema({
-    questions: String,
-    answers: Array,
+    question: String,
+    answer: String,
     level: Number,
+    choices: Array,
     category: String
   });
 
