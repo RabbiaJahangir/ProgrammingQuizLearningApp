@@ -12,7 +12,8 @@ var express = require('express'),
   credentials = require('./credentials'),
   mongoose = require('mongoose'),
   Logger = require('morgan'),
-  jwt = require('jsonwebtoken');
+  jwt = require('jsonwebtoken'),
+  socketioJwt = require('socketio-jwt');
 
 // ------====== configuration ========-------
 
@@ -100,7 +101,16 @@ server.listen(PORT, function () {
 });
 
 var players = [];
+
+// to authorize the socket connections
+io.set('authorization', socketioJwt.authorize({
+  secret: credentials.secret,
+  handshake: true
+}));
+
 io.on('connection', function (socket) {
+  console.log(socket);
+  console.log(socket.handshake.decoded_token.email, 'connected');
 
   players.push(socket);
   console.log("Got some connection");
@@ -113,6 +123,7 @@ io.on('connection', function (socket) {
   });
 
 });
+
 
 /* server = require('http').Server(app),
  io = require('socket.io')(server),
