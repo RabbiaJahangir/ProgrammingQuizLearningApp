@@ -144,6 +144,15 @@ module.exports = function (app, express, jwt, user) {
 
   // PUT THE ROUTES HERE THAT NEEDS TO BE PROTECTED
 
+  /* this route is to indicate only the success, the failure will automaticall will be handled by app.use route since that
+   will be executed on every request */
+  app.get('/authenticate', function (req, res) {
+    return res.status(200).send({
+      success: true,
+      message: 'Valid user.'
+    });
+  });
+
 
 };
 
