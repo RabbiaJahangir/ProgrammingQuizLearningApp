@@ -108,21 +108,38 @@ io.set('authorization', socketioJwt.authorize({
   handshake: true
 }));
 
-io.on('connection', function (socket) {
-  console.log(socket);
-  console.log(socket.handshake.decoded_token.email, 'connected');
+/* we will use the default namespace of '/'
+ *  But as soon as the player is authenticated and connected, we will add him to allPlayers room
+ */
 
-  players.push(socket);
-  console.log("Got some connection");
-  io.emit('noOfPlayers', {no: players.length});
+io.on('connect', function (player) {
+  // player has been connected, now let him join allPlayers room
 
-  socket.on('disconnect', function () {
-    console.log("player disconnected");
-    players.splice(players.indexOf(socket), 1);
-    io.emit('noOfPlayers', {no: players.length});
+  player.join('allPlayers', function () {
+    // emit playersRoomJoined event
+    player.emit('playersRoomJoined', {})
+  })
+
+  player.on('disconnect', function (player) {
+    console.log('player disconnected');
   });
-
 });
+
+//
+// io.on('connection', function (socket) {
+//   // console.log(socket.handshake.decoded_token.email, 'connected');
+//
+//   players.push(socket);
+//   console.log("Got some connection");
+//   io.emit('noOfPlayers', {no: players.length});
+//
+//   socket.on('disconnect', function () {
+//     console.log("player disconnected");
+//     players.splice(players.indexOf(socket), 1);
+//     io.emit('noOfPlayers', {no: players.length});
+//   });
+//
+// });
 
 
 /* server = require('http').Server(app),
