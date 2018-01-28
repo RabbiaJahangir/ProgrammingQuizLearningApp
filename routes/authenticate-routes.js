@@ -66,7 +66,7 @@ module.exports = function (app, express, jwt, user) {
           });
         } else {
 
-          var defaultUserLevel = 0;
+          var defaultUserLevel = 1;
 
           var newPlayer = new User();
           newPlayer.firstName = req.body.firstName;
