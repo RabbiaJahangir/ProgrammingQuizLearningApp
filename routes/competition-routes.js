@@ -13,7 +13,7 @@ module.exports = function (app, user, questions) {
       if (!err) {
 
         // Find the questions by the user level and the category he has selected
-        Questions.find({category: query.categoryId, level: (user.level + 1)}, function (err, questions) {
+        Questions.find({category: query.categoryId, level: (user.level)}, function (err, questions) {
           if (!err) {
             res.send(questions);
           } else {
