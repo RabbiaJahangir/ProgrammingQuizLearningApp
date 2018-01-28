@@ -66,6 +66,7 @@ module.exports = function (app, express, jwt, user) {
           });
         } else {
 
+          // default level for the users should be 1 on signing up
           var defaultUserLevel = 1;
 
           var newPlayer = new User();
