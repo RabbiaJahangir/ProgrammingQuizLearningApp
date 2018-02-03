@@ -1,6 +1,31 @@
 /**
  * Created by Rabbia on 11/10/2015.
  */
+/* -----------Example document-------------
+{
+    "_id": {
+        "$oid": "59a8c82126cc2800110005c7"
+    },
+    "avatar": "av_20",
+    "password": "abcd",
+    "email": "rabbia@gmail.com",
+    "lastName": "Umer",
+    "firstName": "Rabbia",
+    "__v": 0
+    "levels": {
+        "category_id" : [{
+            "level": 1,
+            "correct": []
+            }]
+        ,
+        "category_id#": [{
+            "level": 1,
+            "correct": []
+            }]
+    }
+}
+------------------------------------------
+*/
 
 var bcrypt = require('bcrypt');
 
@@ -11,8 +36,8 @@ module.exports = function (mongoose) {
     lastName: String,
     email: String,
     password: String,
-    level: Number,
-    avatar: String
+    avatar: String,
+    levels: Object
   });
 
   user.methods.createPasswordHash = function (pass) {

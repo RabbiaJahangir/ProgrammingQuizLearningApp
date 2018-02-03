@@ -87,7 +87,7 @@ var questions = require('./models/questions')(mongoose);
 
 // -------====== Local Files Require To Include in the app ======-------
 require('./routes/avatar-routes')(app);
-require('./routes/authenticate-routes')(app, express, jwt, user);
+require('./routes/authenticate-routes')(app, express, jwt, user, cat);
 // any routes after above authenticate-routes will be protected by default BECUASE OF USE MIDDLEWARE IN ABOVE REQUIRED FILE
 // need valid credential/token to access anything below
 require('./routes/categories-route')(app, cat);
