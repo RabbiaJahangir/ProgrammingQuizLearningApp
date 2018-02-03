@@ -70,7 +70,7 @@ module.exports = function (app, express, jwt, user, cat) {
               // default level for the users should be 1 on signing up
               var defaultUserLevel = 1;
 
-              var levelsObj = {};
+              var levelsObj = [];
               cats.forEach(function (cat) {
                 levelsObj.push({
                   category: cat,
