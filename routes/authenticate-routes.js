@@ -72,11 +72,11 @@ module.exports = function (app, express, jwt, user, cat) {
 
               var levelsObj = {};
               cats.forEach(function (cat) {
-                levelsObj = {
+                levelsObj.push({
                   category: cat,
                   level: defaultUserLevel,
                   correct: []
-                };
+                });
               });
 
               var newPlayer = new User();
