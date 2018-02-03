@@ -71,8 +71,9 @@ module.exports = function (app, express, jwt, user, cat) {
               var defaultUserLevel = 1;
 
               var levelsObj = {};
-              cats.forEach(function (category) {
-                levelsObj[category.id] = {
+              cats.forEach(function (cat) {
+                levelsObj = {
+                  category: cat,
                   level: defaultUserLevel,
                   correct: []
                 };
