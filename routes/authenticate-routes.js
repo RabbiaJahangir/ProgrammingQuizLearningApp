@@ -65,49 +65,35 @@ module.exports = function (app, express, jwt, user, cat) {
             message: "User already exists"
           });
         } else {
-          cat.find({}, function (err, cats) {
-            if (!err) {
-              // default level for the users should be 1 on signing up
-              var defaultUserLevel = 1;
 
-              var levelsObj = [];
-              cats.forEach(function (cat) {
-                levelsObj.push({
-                  category: cat,
-                  level: defaultUserLevel,
-                  correct: []
-                });
-              });
+          var newPlayer = new User();
+          newPlayer.firstName = req.body.firstName;
+          newPlayer.lastName = req.body.lastName;
+          newPlayer.email = req.body.email;
+          newPlayer.password = newPlayer.createPasswordHash(req.body.password);
+          // an empty array when creating a new user, categories will be added into this upon successful completion of levels
+          newPlayer.levels = [];
 
-              var newPlayer = new User();
-              newPlayer.firstName = req.body.firstName;
-              newPlayer.lastName = req.body.lastName;
-              newPlayer.email = req.body.email;
-              newPlayer.password = newPlayer.createPasswordHash(req.body.password);
-              newPlayer.levels = levelsObj;
+          // assigning the default picture, name of avatar is from configs/avatar.js
+          newPlayer.avatar = "av_12";
 
-              // assigning the default picture, name of avatar is from configs/avatar.js
-              newPlayer.avatar = "av_12";
-
-              newPlayer.save(function (err, user) {
-                if (err) {
-                  throw err;
-                }
-
-                // if player/user has been created, create a new token
-                // create a token
-                var token = jwt.sign(user, app.get('appSecret'), {
-                  expiresIn: 60 * 60 * 24 // expires in 24 hours
-                });
-
-                res.status(200).json({
-                  success: true,
-                  message: "Signed up successfully",
-                  token: token
-                });
-
-              });
+          newPlayer.save(function (err, user) {
+            if (err) {
+              throw err;
             }
+
+            // if player/user has been created, create a new token
+            // create a token
+            var token = jwt.sign(user, app.get('appSecret'), {
+              expiresIn: 60 * 60 * 24 // expires in 24 hours
+            });
+
+            res.status(200).json({
+              success: true,
+              message: "Signed up successfully",
+              token: token
+            });
+
           });
         }
 
