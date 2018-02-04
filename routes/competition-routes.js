@@ -1,26 +1,23 @@
-module.exports = function (app, user, questions) {
+module.exports = function (app, user, questions, cat) {
 
   var User = user;
   var Questions = questions;
+  var Categories = cat;
 
   // This route requires that Front End sends the categoryId as a parameter
   app.get('/questions', function (req, res) {
-    var userEmail = req.decoded._doc.email;
     var query = req.query;
 
-    // Finding record for the current user in DB, to get the current level of the user/player
-    User.findOne({email: userEmail}, function (err, user) {
+    var categoryLevel = req.user.levels.find(function (levelObj) {
+      levelObj.category._id === query.categoryId;
+    });
+
+    var userCategoryLevel = categoryLevel && categoryLevel.level ? categoryLevel.level : 1;
+
+    // Find the questions by the user level and the category he has selected
+    Questions.find({category: query.categoryId, level: userCategoryLevel}, function (err, questions) {
       if (!err) {
-
-        // Find the questions by the user level and the category he has selected
-        Questions.find({category: query.categoryId, level: (user.level)}, function (err, questions) {
-          if (!err) {
-            res.send(questions);
-          } else {
-            console.log(err);
-          }
-        });
-
+        res.send(questions);
       } else {
         console.log(err);
       }
