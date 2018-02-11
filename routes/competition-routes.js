@@ -46,6 +46,25 @@ module.exports = function (app, user, questions, cat) {
     // if user already has some level of that category then use that
     if (categoryLevel) {
 
+      if (noOfCorrectAnswers === results.length) { // ***** If ALL answers were correct ******
+        categoryLevel.level = defaultuserLevel + 1;
+        categoryLevel.correct = correcAnswerQuestionIds;
+        responseObj.success = true;
+
+        // Update user's levels property
+        req.user.levels = categoryLevel;
+      } else {
+        responseObj.success = false;
+      }
+
+      // Save user with updated level object
+      req.user.save(function (err, user) {
+        if (err) {
+          throw err;
+        }
+        res.status(200).json(responseObj);
+      });
+
     } else { // otherwise create a new object for user's levels object
       Categories.findOne({_id: categoryId}, function (err, category) {
 
