@@ -39,20 +39,17 @@ module.exports = function (app, user, questions, cat) {
       }
     });
 
-    var categoryLevel = req.user.levels.find(function (levelObj) {
+    var categoryLevelIndex = req.user.levels.findIndex(function (levelObj) {
       return levelObj.category._id == categoryId; // Note: don't use triple equals here
     });
 
     // if user already has some level of that category then use that
-    if (categoryLevel) {
+    if (categoryLevelIndex) {
 
       if (noOfCorrectAnswers === results.length) { // ***** If ALL answers were correct ******
-        categoryLevel.level = defaultuserLevel + 1;
-        categoryLevel.correct = correcAnswerQuestionIds;
+        req.user.levels[categoryLevelIndex].level = defaultuserLevel + 1;
+        req.user.levels[categoryLevelIndex].correct = correcAnswerQuestionIds;
         responseObj.success = true;
-
-        // Update user's levels property
-        req.user.levels = categoryLevel;
       } else {
         responseObj.success = false;
       }
