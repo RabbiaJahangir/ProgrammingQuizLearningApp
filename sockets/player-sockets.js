@@ -16,7 +16,7 @@ module.exports = function (io, socketioJwt, credentials) {
 
   io.on('connect', function (player) {
 
-    console.log('hello! ', player.request.decoded_token);
+    // console.log('hello! ', player.request.decoded_token);
 
     // player has been connected, now let him join allPlayers room
 
@@ -24,12 +24,12 @@ module.exports = function (io, socketioJwt, credentials) {
       // emit playersRoomJoined event
       // player.emit('playersRoomJoined');
 
-      console.log(player.rooms);
-      console.log(player.id);
+      // console.log(player.rooms);
+      // console.log(player.id);
 
       // player.emit('totalPlayers', {totalPlayers:Object.})
       // console.log(io.sockets.clients(ALL_PLAYERS_ROOM));
-      console.log(io.sockets.adapter.rooms[ALL_PLAYERS_ROOM].length);
+      // console.log(io.sockets.adapter.rooms[ALL_PLAYERS_ROOM].length);
     });
 
     console.log('player connected');

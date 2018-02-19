@@ -44,7 +44,7 @@ module.exports = function (app, user, questions, cat) {
     });
 
     // if user already has some level of that category then use that
-    if (categoryLevelIndex) {
+    if (categoryLevelIndex >= 0) {
 
       if (noOfCorrectAnswers === results.length) { // ***** If ALL answers were correct ******
         req.user.levels[categoryLevelIndex].level = defaultuserLevel + 1;
