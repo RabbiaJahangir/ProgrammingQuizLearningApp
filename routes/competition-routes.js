@@ -45,15 +45,13 @@ module.exports = function (app, user, questions, cat) {
 
     // if user already has some level of that category then use that
     if (categoryLevelIndex >= 0) {
-
       if (noOfCorrectAnswers === results.length) { // ***** If ALL answers were correct ******
-        req.user.levels[categoryLevelIndex].level = defaultuserLevel + 1;
+        req.user.levels[categoryLevelIndex].level = req.user.levels[categoryLevelIndex].level + 1;
         req.user.levels[categoryLevelIndex].correct = correcAnswerQuestionIds;
         responseObj.success = true;
       } else {
         responseObj.success = false;
       }
-
       // Save user with updated level object
       req.user.save(function (err, user) {
         if (err) {
