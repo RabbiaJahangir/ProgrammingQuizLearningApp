@@ -2,7 +2,10 @@ var util = require('util')
 
 module.exports = function (io, socketioJwt, credentials) {
 
-  var ALL_PLAYERS_ROOM = 'allPlayers'; // name for room of all players
+  var defaultNamespace = '/';
+
+  var ALL_PLAYERS_ROOM = 'allPlayers'; // all players, not looking for a match will be in this room
+  var MATCHING_ROOM = 'matchRoom'; //  all the users looking for a match will be put into this room
 
   // to authorize the socket connections
   io.set('authorization', socketioJwt.authorize({
@@ -16,20 +19,31 @@ module.exports = function (io, socketioJwt, credentials) {
 
   io.on('connect', function (player) {
     console.log('connected');
+    sendTotalPlayersUpdate();
     // console.log('hello! ', player.request.decoded_token);
-
     // player has been connected, now let him join allPlayers room
     player.join(ALL_PLAYERS_ROOM, function () {
       sendFreePlayersUpdate();
+
+      player.on('matchPlayer', function () {
+        sendTotalPlayersUpdate()
+        sendFreePlayersUpdate();
+
+        player.leave(ALL_PLAYERS_ROOM, function () {
+          console.log('removed from ', ALL_PLAYERS_ROOM);
+
+          player.join(MATCHING_ROOM, function () {
+            console.log('joined ', MATCHING_ROOM);
+          });
+        });
+      });
+      console.log(Object.keys(io.sockets.connected).length);
     });
 
     player.on('disconnect', function (player) {
       console.log('disconnected');
+      sendTotalPlayersUpdate();
       sendFreePlayersUpdate();
-    });
-
-    player.on('matchPlayer', function () {
-      sendFreePlayersUpdate(player);
     });
   });
 
@@ -43,7 +57,16 @@ module.exports = function (io, socketioJwt, credentials) {
     return freePlayers;
   }
 
+  function getTotalPlayers() {
+    return Object.keys(io.sockets.connected);
+  }
+
   function sendFreePlayersUpdate() {
     io.emit('updateFreePlayers', {players: getFreePlayers()})
   }
-};
+
+  function sendTotalPlayersUpdate() {
+    var totalPlayers = getTotalPlayers();
+    io.emit('totalPlayers', {playerIds: totalPlayers, count: totalPlayers.length})
+  }
+}
