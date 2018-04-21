@@ -15,31 +15,35 @@ module.exports = function (io, socketioJwt, credentials) {
    */
 
   io.on('connect', function (player) {
-
+    console.log('connected');
     // console.log('hello! ', player.request.decoded_token);
 
     // player has been connected, now let him join allPlayers room
-
     player.join(ALL_PLAYERS_ROOM, function () {
-      // emit playersRoomJoined event
-      // player.emit('playersRoomJoined');
-
-      // console.log(player.rooms);
-      // console.log(player.id);
-
-      // player.emit('totalPlayers', {totalPlayers:Object.})
-      // console.log(io.sockets.clients(ALL_PLAYERS_ROOM));
-      // console.log(io.sockets.adapter.rooms[ALL_PLAYERS_ROOM].length);
+      sendFreePlayersUpdate();
     });
-
-    console.log('player connected');
-
-    player.emit('connectedObj', util.inspect(player));
 
     player.on('disconnect', function (player) {
-      console.log('player disconnected');
+      console.log('disconnected');
+      sendFreePlayersUpdate();
     });
 
+    player.on('matchPlayer', function () {
+      sendFreePlayersUpdate(player);
+    });
   });
 
+
+  function getFreePlayers() {
+    var freePlayers = [];
+    var socketsConnectedToAllPlayers = io.in(ALL_PLAYERS_ROOM).connected;
+    Object.keys(socketsConnectedToAllPlayers).forEach(function (socket) {
+      freePlayers.push(socketsConnectedToAllPlayers[socket].id);
+    });
+    return freePlayers;
+  }
+
+  function sendFreePlayersUpdate() {
+    io.emit('updateFreePlayers', {players: getFreePlayers()})
+  }
 };
