@@ -39,6 +39,14 @@ module.exports = function (io, socketioJwt, credentials) {
       });
     });
 
+    player.on('leaveMatch', function () {
+      player.leave(MATCHING_ROOM, function () {
+        player.join(ALL_PLAYERS_ROOM);
+        sendTotalPlayersUpdate();
+        sendFreePlayersUpdate();
+      });
+    });
+
     player.on('disconnect', function (player) {
       console.log('disconnected');
       sendTotalPlayersUpdate();
@@ -62,7 +70,7 @@ module.exports = function (io, socketioJwt, credentials) {
   function sendFreePlayersUpdate() {
     var freePlayers = getFreePlayers();
     var ids = freePlayers ? freePlayers.sockets : {};
-    var count = freePlayers ? freePlayers.count : 0;
+    var count = freePlayers ? Object.keys(freePlayers.sockets).length : 0;
     io.emit('freePlayers', {playerIds: ids, count: count})
   }
 
