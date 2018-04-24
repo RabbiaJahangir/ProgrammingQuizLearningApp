@@ -21,23 +21,22 @@ module.exports = function (io, socketioJwt, credentials) {
     console.log('connected');
     sendTotalPlayersUpdate();
     // console.log('hello! ', player.request.decoded_token);
+
     // player has been connected, now let him join allPlayers room
     player.join(ALL_PLAYERS_ROOM, function () {
+      sendTotalPlayersUpdate();
       sendFreePlayersUpdate();
 
       player.on('matchPlayer', function () {
-        sendTotalPlayersUpdate()
-        sendFreePlayersUpdate();
-
         player.leave(ALL_PLAYERS_ROOM, function () {
-          console.log('removed from ', ALL_PLAYERS_ROOM);
-
           player.join(MATCHING_ROOM, function () {
             console.log('joined ', MATCHING_ROOM);
+            sendTotalPlayersUpdate();
+            sendFreePlayersUpdate();
+
           });
         });
       });
-      console.log(Object.keys(io.sockets.connected).length);
     });
 
     player.on('disconnect', function (player) {
@@ -49,12 +48,11 @@ module.exports = function (io, socketioJwt, credentials) {
 
 
   function getFreePlayers() {
-    var freePlayers = [];
-    var socketsConnectedToAllPlayers = io.in(ALL_PLAYERS_ROOM).connected;
-    Object.keys(socketsConnectedToAllPlayers).forEach(function (socket) {
-      freePlayers.push(socketsConnectedToAllPlayers[socket].id);
-    });
-    return freePlayers;
+    var allPlayersRoom = io.sockets.adapter.rooms[ALL_PLAYERS_ROOM];
+    if (allPlayersRoom) {
+      return allPlayersRoom;
+    }
+    return null;
   }
 
   function getTotalPlayers() {
@@ -62,7 +60,10 @@ module.exports = function (io, socketioJwt, credentials) {
   }
 
   function sendFreePlayersUpdate() {
-    io.emit('updateFreePlayers', {players: getFreePlayers()})
+    var freePlayers = getFreePlayers();
+    var ids = freePlayers ? freePlayers.sockets : {};
+    var count = freePlayers ? freePlayers.count : 0;
+    io.emit('freePlayers', {playerIds: ids, count: count})
   }
 
   function sendTotalPlayersUpdate() {
