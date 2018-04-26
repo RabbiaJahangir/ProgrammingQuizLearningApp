@@ -24,15 +24,15 @@ module.exports = function (io, socketioJwt, credentials) {
 
     // player has been connected, now let him join allPlayers room
     player.join(ALL_PLAYERS_ROOM, function () {
-      sendTotalPlayersUpdate();
-      sendFreePlayersUpdate();
+      sendPlayersUpdate();
 
       player.on('matchPlayer', function () {
         player.leave(ALL_PLAYERS_ROOM, function () {
           player.join(MATCHING_ROOM, function () {
             console.log('joined ', MATCHING_ROOM);
-            sendTotalPlayersUpdate();
-            sendFreePlayersUpdate();
+            sendPlayersUpdate();
+
+            // findMatchingPlayer(player);
 
           });
         });
@@ -42,18 +42,40 @@ module.exports = function (io, socketioJwt, credentials) {
     player.on('leaveMatch', function () {
       player.leave(MATCHING_ROOM, function () {
         player.join(ALL_PLAYERS_ROOM);
-        sendTotalPlayersUpdate();
-        sendFreePlayersUpdate();
+        sendPlayersUpdate();
       });
     });
 
     player.on('disconnect', function (player) {
       console.log('disconnected');
-      sendTotalPlayersUpdate();
-      sendFreePlayersUpdate();
+      sendPlayersUpdate();
     });
   });
 
+  // function findMatchingPlayer(playerToMatch) {
+  //   var playersInMatchRoom = Object.keys(io.sockets.adapter.rooms[MATCHING_ROOM].sockets);
+  //
+  //   var playerFindInterval = setInterval(function () {
+  //     console.log('---interval---: ', playerToMatch.id);
+  //     var foundPlayer = playersInMatchRoom.find(function (player) {
+  //       return player !== playerToMatch.id;
+  //     });
+  //
+  //     if (foundPlayer) {
+  //       clearInterval(foundPlayer);
+  //       io.sockets.sockets[foundPlayer].emit('terminateMatch');
+  //       console.log(io.sockets.sockets[foundPlayer]);
+  //       console.log('Found player:   ', foundPlayer);
+  //       playerToMatch.leave(MATCHING_ROOM);
+  //     }
+  //   }, 500);
+  //
+  //
+  //   playerToMatch.on('terminateMatch', function () {
+  //     console.log('-------terminated------');
+  //     clearInterval(playerFindInterval)
+  //   });
+  // }
 
   function getFreePlayers() {
     var allPlayersRoom = io.sockets.adapter.rooms[ALL_PLAYERS_ROOM];
@@ -67,15 +89,36 @@ module.exports = function (io, socketioJwt, credentials) {
     return Object.keys(io.sockets.connected);
   }
 
+  function getMatchingPlayers() {
+    var matchingPlayersRoom = io.sockets.adapter.rooms[MATCHING_ROOM];
+    if (MATCHING_ROOM) {
+      return matchingPlayersRoom;
+    }
+    return null;
+  }
+
   function sendFreePlayersUpdate() {
     var freePlayers = getFreePlayers();
     var ids = freePlayers ? freePlayers.sockets : {};
     var count = freePlayers ? Object.keys(freePlayers.sockets).length : 0;
-    io.emit('freePlayers', {playerIds: ids, count: count})
+    io.emit('freePlayers', {playerIds: ids, count: count});
   }
 
   function sendTotalPlayersUpdate() {
     var totalPlayers = getTotalPlayers();
     io.emit('totalPlayers', {playerIds: totalPlayers, count: totalPlayers.length})
+  }
+
+  function sendMatchingPlayers() {
+    var matchingPlayers = getMatchingPlayers();
+    var ids = matchingPlayers ? matchingPlayers.sockets : {};
+    var count = matchingPlayers ? Object.keys(matchingPlayers.sockets).length : 0;
+    io.emit('matchingPlayers', {playerIds: ids, count: count});
+  }
+
+  function sendPlayersUpdate() {
+    sendTotalPlayersUpdate();
+    sendFreePlayersUpdate();
+    sendMatchingPlayers();
   }
 }
