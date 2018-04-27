@@ -47,15 +47,19 @@ module.exports = function (io, socketioJwt, credentials) {
                   playerSocket.leave(room);
                   playerSocket.join(individualRoom, function () {
                     playerSocket.emit('matched');
+                    player.leave(MATCHING_ROOM);
                   });
 
                   playerSocket.on('leaveMatch', function () {
                     playerSocket.leave(individualRoom);
                     playerSocket.removeAllListeners('leaveMatch');
+                    playerSocket.join(ALL_PLAYERS_ROOM);
                     io.to(individualRoom).emit('playerLeft');
 
                     matchingSockets.forEach(function (playerSocketId) {
                       var socketToLeave = io.sockets.connected[playerSocketId];
+                      playerSocket.leave(individualRoom);
+                      playerSocket.join(ALL_PLAYERS_ROOM);
                       socketToLeave.removeAllListeners('leaveMatch');
                     });
                   });
