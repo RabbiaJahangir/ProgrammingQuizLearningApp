@@ -19,6 +19,7 @@ module.exports = function (io, socketioJwt, credentials) {
 
   io.on('connect', function (player) {
     console.log('connected');
+    console.log(io.sockets.connected);
     sendTotalPlayersUpdate();
     // console.log('hello! ', player.request.decoded_token);
 
@@ -26,22 +27,51 @@ module.exports = function (io, socketioJwt, credentials) {
     player.join(ALL_PLAYERS_ROOM, function () {
       sendPlayersUpdate();
 
-      player.on('matchPlayer', function () {
+      player.on('matchPlayer', function (data) {
+        console.log(data);
         player.leave(ALL_PLAYERS_ROOM, function () {
           player.join(MATCHING_ROOM, function () {
             console.log('joined ', MATCHING_ROOM);
             sendPlayersUpdate();
 
-            // findMatchingPlayer(player);
+            player.join(data.categoryId, function () {
+              var room = data.categoryId;
+              var connectedSockets = Object.keys(io.sockets.adapter.rooms[room].sockets);
 
+              // If two players have joined the room of same category, match them
+              if (connectedSockets.length >= 2) {
+                var matchingSockets = connectedSockets.slice(0, 2);
+                var individualRoom = matchingSockets[0] + matchingSockets[1];
+                matchingSockets.forEach(function (socket) {
+                  var playerSocket = io.sockets.connected[socket];
+                  playerSocket.leave(room);
+                  playerSocket.join(individualRoom, function () {
+                    playerSocket.emit('matched');
+                  });
+
+                  playerSocket.on('leaveMatch', function () {
+                    playerSocket.leave(individualRoom);
+                    playerSocket.removeAllListeners('leaveMatch');
+                    io.to(individualRoom).emit('playerLeft');
+
+                    matchingSockets.forEach(function (playerSocketId) {
+                      var socketToLeave = io.sockets.connected[playerSocketId];
+                      socketToLeave.removeAllListeners('leaveMatch');
+                    });
+                  });
+                });
+              }
+            });
           });
         });
       });
     });
 
-    player.on('leaveMatch', function () {
+    player.on('leaveMatch', function (data) {
       player.leave(MATCHING_ROOM, function () {
-        player.join(ALL_PLAYERS_ROOM);
+        player.leave(data.categoryId, function () {
+          player.join(ALL_PLAYERS_ROOM);
+        });
         sendPlayersUpdate();
       });
     });
@@ -51,31 +81,6 @@ module.exports = function (io, socketioJwt, credentials) {
       sendPlayersUpdate();
     });
   });
-
-  // function findMatchingPlayer(playerToMatch) {
-  //   var playersInMatchRoom = Object.keys(io.sockets.adapter.rooms[MATCHING_ROOM].sockets);
-  //
-  //   var playerFindInterval = setInterval(function () {
-  //     console.log('---interval---: ', playerToMatch.id);
-  //     var foundPlayer = playersInMatchRoom.find(function (player) {
-  //       return player !== playerToMatch.id;
-  //     });
-  //
-  //     if (foundPlayer) {
-  //       clearInterval(foundPlayer);
-  //       io.sockets.sockets[foundPlayer].emit('terminateMatch');
-  //       console.log(io.sockets.sockets[foundPlayer]);
-  //       console.log('Found player:   ', foundPlayer);
-  //       playerToMatch.leave(MATCHING_ROOM);
-  //     }
-  //   }, 500);
-  //
-  //
-  //   playerToMatch.on('terminateMatch', function () {
-  //     console.log('-------terminated------');
-  //     clearInterval(playerFindInterval)
-  //   });
-  // }
 
   function getFreePlayers() {
     var allPlayersRoom = io.sockets.adapter.rooms[ALL_PLAYERS_ROOM];
