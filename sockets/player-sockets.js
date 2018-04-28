@@ -19,9 +19,7 @@ module.exports = function (io, socketioJwt, credentials) {
 
   io.on('connect', function (player) {
     console.log('connected');
-    console.log(io.sockets.connected);
     sendTotalPlayersUpdate();
-    // console.log('hello! ', player.request.decoded_token);
 
     // player has been connected, now let him join allPlayers room
     player.join(ALL_PLAYERS_ROOM, function () {
@@ -40,14 +38,19 @@ module.exports = function (io, socketioJwt, credentials) {
 
               // If two players have joined the room of same category, match them
               if (connectedSockets.length >= 2) {
-                var matchingSockets = connectedSockets.slice(0, 2);
-                var privateRoomForMatchedPlayers = matchingSockets[0] + matchingSockets[1];
+                var matchingSocketsIds = connectedSockets.slice(0, 2);
+                var privateRoomForMatchedPlayers = matchingSocketsIds[0] + matchingSocketsIds[1];
 
-                matchingSockets.forEach(function (socket) {
+                var matchingSocketsUsers = [];
+                matchingSocketsIds.forEach(function (socket) {
+                  matchingSocketsUsers.push(io.sockets.connected[socket].request.decoded_token._doc);
+                })
+
+                matchingSocketsIds.forEach(function (socket) {
                   var playerSocket = io.sockets.connected[socket];
                   playerSocket.leave(categoryRoom);
                   playerSocket.join(privateRoomForMatchedPlayers, function () {
-                    playerSocket.emit('matched');
+                    playerSocket.emit('matched', matchingSocketsUsers);
                     player.leave(MATCHING_ROOM);
                   });
 
@@ -57,7 +60,7 @@ module.exports = function (io, socketioJwt, credentials) {
                     playerSocket.join(ALL_PLAYERS_ROOM);
                     io.to(privateRoomForMatchedPlayers).emit('playerLeft');
 
-                    matchingSockets.forEach(function (playerSocketId) {
+                    matchingSocketsIds.forEach(function (playerSocketId) {
                       var socketToLeave = io.sockets.connected[playerSocketId];
                       playerSocket.leave(privateRoomForMatchedPlayers);
                       playerSocket.join(ALL_PLAYERS_ROOM);
