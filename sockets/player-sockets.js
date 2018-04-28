@@ -66,13 +66,14 @@ module.exports = function (io, socketioJwt, credentials, questions) {
                     });
                   });
 
-                  playerSocket.on('correctAnswer', function (correctPlayer) {
+                  playerSocket.on('answered', function (correctPlayer) {
+                    console.log('here here here here here here');
                     matchingSocketsUsers.forEach(function (playerInMatch, index) {
-                      if ((matchingSocketsUsersProfile[index].email !== correctPlayer.user.email) && correctPlayer.correct) {
+                      if (matchingSocketsUsersProfile[index].email !== correctPlayer.user.email) {
                         console.log('===============================================================');
                         console.log(matchingSocketsUsersProfile);
                         console.log(correctPlayer);
-                        playerInMatch.emit('failed', data.index);
+                        playerInMatch.emit('failed', correctPlayer.index);
                       }
                     })
                   });
