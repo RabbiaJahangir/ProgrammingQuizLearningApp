@@ -45,8 +45,9 @@ module.exports = function (io, socketioJwt, credentials, questions) {
                 matchingSocketsIds.forEach(function (socket) {
                   matchingSocketsUsersProfile.push(io.sockets.connected[socket].request.decoded_token._doc);
                   matchingSocketsUsers.push(io.sockets.connected[socket]);
-                })
+                });
 
+                var results = [];
                 matchingSocketsIds.forEach(function (socket) {
                   var playerSocket = io.sockets.connected[socket];
                   playerSocket.leave(categoryRoom);
@@ -67,15 +68,32 @@ module.exports = function (io, socketioJwt, credentials, questions) {
                   });
 
                   playerSocket.on('answered', function (correctPlayer) {
-                    console.log('here here here here here here');
                     matchingSocketsUsers.forEach(function (playerInMatch, index) {
                       if (matchingSocketsUsersProfile[index].email !== correctPlayer.user.email) {
-                        console.log('===============================================================');
-                        console.log(matchingSocketsUsersProfile);
-                        console.log(correctPlayer);
                         playerInMatch.emit('failed', correctPlayer.index);
                       }
                     })
+                  });
+
+                  playerSocket.on('submitResults', function (res) {
+                    var result = res;
+                    result.socket = playerSocket;
+                    results.push(result);
+
+                    if (results.length >= 2) {
+                      if (results[0].correct > results[1].correct) {
+                        results[0].socket.emit('results', {result: 'won'});
+                        results[1].socket.emit('results', {result: 'lost'});
+                      } else if (results[0].correct < results[1].correct) {
+                        results[0].socket.emit('results', {result: 'lost'});
+                        results[1].socket.emit('results', {result: 'won'});
+                      } else if (results[0].correct === results[1].correct) {
+                        results[0].socket.emit('results', {result: 'draw'});
+                        results[1].socket.emit('results', {result: 'draw'});
+                      }
+                      //empty array
+                      results = [];
+                    }
                   });
 
                   playerSocket.on('leaveMatch', function () {
@@ -83,6 +101,7 @@ module.exports = function (io, socketioJwt, credentials, questions) {
                     playerSocket.removeAllListeners('leaveMatch');
                     playerSocket.removeAllListeners('startMatch');
                     playerSocket.removeAllListeners('correctAnswer');
+                    playerSocket.removeAllListeners('submitResults');
                     playerSocket.join(ALL_PLAYERS_ROOM);
                     io.to(privateRoomForMatchedPlayers).emit('playerLeft');
 
@@ -93,6 +112,7 @@ module.exports = function (io, socketioJwt, credentials, questions) {
                       playerSocket.removeAllListeners('leaveMatch');
                       playerSocket.removeAllListeners('startMatch');
                       playerSocket.removeAllListeners('correctAnswer');
+                      playerSocket.removeAllListeners('submitResults');
                     });
                   });
                 });
