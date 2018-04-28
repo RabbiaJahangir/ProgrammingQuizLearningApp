@@ -27,6 +27,11 @@ module.exports = function (app, user, jwt) {
     });
   });
 
+  app.get('/avatar', function (req, res) {
+    var avatarLink = helper.generateAvatarLink(req.query.avatar, req.headers.host);
+    res.send(avatarLink);
+  });
+
   app.post('/set-avatar', function (req, res) {
 
     // check header or url parameters or post parameters for token
