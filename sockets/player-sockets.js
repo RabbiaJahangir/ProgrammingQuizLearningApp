@@ -102,17 +102,19 @@ module.exports = function (io, socketioJwt, credentials, questions) {
                     playerSocket.removeAllListeners('startMatch');
                     playerSocket.removeAllListeners('correctAnswer');
                     playerSocket.removeAllListeners('submitResults');
+                    playerSocket.removeAllListeners('answered');
                     playerSocket.join(ALL_PLAYERS_ROOM);
                     io.to(privateRoomForMatchedPlayers).emit('playerLeft');
 
                     matchingSocketsIds.forEach(function (playerSocketId) {
                       var socketToLeave = io.sockets.connected[playerSocketId];
-                      playerSocket.leave(privateRoomForMatchedPlayers);
-                      playerSocket.join(ALL_PLAYERS_ROOM);
-                      playerSocket.removeAllListeners('leaveMatch');
-                      playerSocket.removeAllListeners('startMatch');
-                      playerSocket.removeAllListeners('correctAnswer');
-                      playerSocket.removeAllListeners('submitResults');
+                      socketToLeave.leave(privateRoomForMatchedPlayers);
+                      socketToLeave.join(ALL_PLAYERS_ROOM);
+                      socketToLeave.removeAllListeners('leaveMatch');
+                      socketToLeave.removeAllListeners('startMatch');
+                      socketToLeave.removeAllListeners('correctAnswer');
+                      socketToLeave.removeAllListeners('submitResults');
+                      socketToLeave.removeAllListeners('answered');
                     });
                   });
                 });
