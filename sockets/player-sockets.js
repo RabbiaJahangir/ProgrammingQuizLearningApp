@@ -35,30 +35,31 @@ module.exports = function (io, socketioJwt, credentials) {
             sendPlayersUpdate();
 
             player.join(data.categoryId, function () {
-              var room = data.categoryId;
-              var connectedSockets = Object.keys(io.sockets.adapter.rooms[room].sockets);
+              var categoryRoom = data.categoryId;
+              var connectedSockets = Object.keys(io.sockets.adapter.rooms[categoryRoom].sockets);
 
               // If two players have joined the room of same category, match them
               if (connectedSockets.length >= 2) {
                 var matchingSockets = connectedSockets.slice(0, 2);
-                var individualRoom = matchingSockets[0] + matchingSockets[1];
+                var privateRoomForMatchedPlayers = matchingSockets[0] + matchingSockets[1];
+
                 matchingSockets.forEach(function (socket) {
                   var playerSocket = io.sockets.connected[socket];
-                  playerSocket.leave(room);
-                  playerSocket.join(individualRoom, function () {
+                  playerSocket.leave(categoryRoom);
+                  playerSocket.join(privateRoomForMatchedPlayers, function () {
                     playerSocket.emit('matched');
                     player.leave(MATCHING_ROOM);
                   });
 
                   playerSocket.on('leaveMatch', function () {
-                    playerSocket.leave(individualRoom);
+                    playerSocket.leave(privateRoomForMatchedPlayers);
                     playerSocket.removeAllListeners('leaveMatch');
                     playerSocket.join(ALL_PLAYERS_ROOM);
-                    io.to(individualRoom).emit('playerLeft');
+                    io.to(privateRoomForMatchedPlayers).emit('playerLeft');
 
                     matchingSockets.forEach(function (playerSocketId) {
                       var socketToLeave = io.sockets.connected[playerSocketId];
-                      playerSocket.leave(individualRoom);
+                      playerSocket.leave(privateRoomForMatchedPlayers);
                       playerSocket.join(ALL_PLAYERS_ROOM);
                       socketToLeave.removeAllListeners('leaveMatch');
                     });
