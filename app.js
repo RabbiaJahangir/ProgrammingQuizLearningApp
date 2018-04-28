@@ -102,4 +102,4 @@ server.listen(PORT, function () {
   console.log('Server up and running on port: ' + PORT);
 });
 
-require('./sockets/player-sockets')(io, socketioJwt, credentials);
+require('./sockets/player-sockets')(io, socketioJwt, credentials, questions);

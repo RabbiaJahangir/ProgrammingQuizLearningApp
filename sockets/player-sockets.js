@@ -1,8 +1,8 @@
 var util = require('util')
 
-module.exports = function (io, socketioJwt, credentials) {
+module.exports = function (io, socketioJwt, credentials, questions) {
 
-  var defaultNamespace = '/';
+  var Questions = questions;
 
   var ALL_PLAYERS_ROOM = 'allPlayers'; // all players, not looking for a match will be in this room
   var MATCHING_ROOM = 'matchRoom'; //  all the users looking for a match will be put into this room
@@ -26,7 +26,6 @@ module.exports = function (io, socketioJwt, credentials) {
       sendPlayersUpdate();
 
       player.on('matchPlayer', function (data) {
-        console.log(data);
         player.leave(ALL_PLAYERS_ROOM, function () {
           player.join(MATCHING_ROOM, function () {
             console.log('joined ', MATCHING_ROOM);
@@ -41,22 +40,48 @@ module.exports = function (io, socketioJwt, credentials) {
                 var matchingSocketsIds = connectedSockets.slice(0, 2);
                 var privateRoomForMatchedPlayers = matchingSocketsIds[0] + matchingSocketsIds[1];
 
+                var matchingSocketsUsersProfile = [];
                 var matchingSocketsUsers = [];
                 matchingSocketsIds.forEach(function (socket) {
-                  matchingSocketsUsers.push(io.sockets.connected[socket].request.decoded_token._doc);
+                  matchingSocketsUsersProfile.push(io.sockets.connected[socket].request.decoded_token._doc);
+                  matchingSocketsUsers.push(io.sockets.connected[socket]);
                 })
 
                 matchingSocketsIds.forEach(function (socket) {
                   var playerSocket = io.sockets.connected[socket];
                   playerSocket.leave(categoryRoom);
                   playerSocket.join(privateRoomForMatchedPlayers, function () {
-                    playerSocket.emit('matched', matchingSocketsUsers);
+                    playerSocket.emit('matched', matchingSocketsUsersProfile);
                     player.leave(MATCHING_ROOM);
+                  });
+
+                  playerSocket.on('startMatch', function () {
+                    var categoryId = data.categoryId;
+                    Questions.find({category: categoryId}).limit(5).exec(function (err, questions) {
+                      if (!err) {
+                        playerSocket.emit('questions', questions);
+                      } else {
+                        console.log(err);
+                      }
+                    });
+                  });
+
+                  playerSocket.on('correctAnswer', function (correctPlayer) {
+                    matchingSocketsUsers.forEach(function (playerInMatch, index) {
+                      if ((matchingSocketsUsersProfile[index].email !== correctPlayer.user.email) && correctPlayer.correct) {
+                        console.log('===============================================================');
+                        console.log(matchingSocketsUsersProfile);
+                        console.log(correctPlayer);
+                        playerInMatch.emit('failed', data.index);
+                      }
+                    })
                   });
 
                   playerSocket.on('leaveMatch', function () {
                     playerSocket.leave(privateRoomForMatchedPlayers);
                     playerSocket.removeAllListeners('leaveMatch');
+                    playerSocket.removeAllListeners('startMatch');
+                    playerSocket.removeAllListeners('correctAnswer');
                     playerSocket.join(ALL_PLAYERS_ROOM);
                     io.to(privateRoomForMatchedPlayers).emit('playerLeft');
 
@@ -64,7 +89,9 @@ module.exports = function (io, socketioJwt, credentials) {
                       var socketToLeave = io.sockets.connected[playerSocketId];
                       playerSocket.leave(privateRoomForMatchedPlayers);
                       playerSocket.join(ALL_PLAYERS_ROOM);
-                      socketToLeave.removeAllListeners('leaveMatch');
+                      playerSocket.removeAllListeners('leaveMatch');
+                      playerSocket.removeAllListeners('startMatch');
+                      playerSocket.removeAllListeners('correctAnswer');
                     });
                   });
                 });
